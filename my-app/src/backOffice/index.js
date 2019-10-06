@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { createComponent } from "react-fela";
-// import squares from "./data";
 
 const style1 = {
   backgroundImage:
@@ -10,15 +9,12 @@ const style1 = {
   backgroundPosition: "center"
 };
 const Square = createComponent(
-  () => ({
-    border: "1px solid black",
+  ({ red }) => ({
+    border: red ? "2px solid red" : "1px solid black",
     minWidth: "13px",
     minHeight: "13px",
     opacity: 0.7,
     zIndex: 10
-    // ":focus": {
-    //   border: "2px solid red"
-    // }
   }),
   "div",
   ["onClick", "data-index-X", "data-index-Y", "value"]
@@ -40,9 +36,6 @@ const Form = createComponent(
 );
 
 const BackOffice = () => {
-  const [openForm, setOpenForm] = useState(false);
-  const [squareFocusX, setSquareFocusX] = useState(null);
-  const [squareFocusY, setSquareFocusY] = useState(null);
   const width = 35;
   const heigth = 44;
   const emptySquare = {
@@ -54,6 +47,7 @@ const BackOffice = () => {
     x: null,
     y: null
   };
+
   let array = [...Array(heigth)].map((lign, index1) =>
     [...Array(width)].map((e, index2) => {
       const square = { ...emptySquare };
@@ -62,7 +56,24 @@ const BackOffice = () => {
       return square;
     })
   );
-  //   console.log(array);
+  const [openForm, setOpenForm] = useState(false);
+  const [squareFocusX, setSquareFocusX] = useState(null);
+  const [squareFocusY, setSquareFocusY] = useState(null);
+  const [arrayState, setArrayState] = useState(array);
+
+  const changeInfo = e => {
+    const newArray = arrayState.map(arrayOfSameX => {
+      arrayOfSameX.map(square =>
+        Number(square.x) === Number(squareFocusX) &&
+        Number(square.y) === Number(squareFocusY)
+          ? (square[e.target.name] = Number(e.target.value))
+          : square
+      );
+      return arrayOfSameX;
+    });
+    setArrayState(newArray);
+  };
+  console.log(arrayState);
   return (
     <>
       <Flex>
@@ -81,6 +92,10 @@ const BackOffice = () => {
                       setSquareFocusY(e.currentTarget.dataset.indexY);
                       setOpenForm(true);
                     }}
+                    red={
+                      Number(index1) === Number(squareFocusX) &&
+                      Number(index2) === Number(squareFocusY)
+                    }
                   />
                 </>
               ))}
@@ -95,19 +110,43 @@ const BackOffice = () => {
             <Form>
               <p>{`Square (x:${squareFocusX}, y:${squareFocusY})`}</p>
               <Flex>
-                <p>Top</p>
-                <input name="top" style={{ width: "10px", height: "10px" }} />
-                <p>Right</p>
-                <input name="right" style={{ width: "10px", height: "10px" }} />
-                <p>Bottom</p>
-                <input
-                  name="bottom"
-                  style={{ width: "10px", height: "10px" }}
-                />
-                <p>Left</p>
-                <input name="left" style={{ width: "10px", height: "10px" }} />
+                <Flex>
+                  <div>Top</div>
+                  <input
+                    name="top"
+                    style={{ width: "10px", height: "10px" }}
+                    onChange={e => changeInfo(e)}
+                    value={arrayState[squareFocusX][squareFocusY].top}
+                  />
+                </Flex>
+                <Flex>
+                  <div>Right</div>
+                  <input
+                    name="right"
+                    style={{ width: "10px", height: "10px" }}
+                    onChange={e => changeInfo(e)}
+                    value={arrayState[squareFocusX][squareFocusY].right}
+                  />
+                </Flex>
+                <Flex>
+                  <div>Bottom</div>
+                  <input
+                    name="bottom"
+                    style={{ width: "10px", height: "10px" }}
+                    onChange={e => changeInfo(e)}
+                    value={arrayState[squareFocusX][squareFocusY].bottom}
+                  />
+                </Flex>
+                <Flex>
+                  <div>Left</div>
+                  <input
+                    name="left"
+                    style={{ width: "10px", height: "10px" }}
+                    onChange={e => changeInfo(e)}
+                    value={arrayState[squareFocusX][squareFocusY].left}
+                  />
+                </Flex>
               </Flex>
-              <button />
             </Form>
           </Flex>
         </Padded>
